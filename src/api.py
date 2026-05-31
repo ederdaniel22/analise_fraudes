@@ -67,6 +67,18 @@ def obter_usuario_atual(token: str = Header(None)) -> Optional[TokenData]:
         )
     return token_data
 
+def exigir_papel(*papeis_permitidos):
+    """Dependência de AUTORIZAÇÃO: garante que o usuário tem um dos papéis exigidos.
+    Bloqueia, por exemplo, que um 'cliente' analise transações ou veja a base de clientes."""
+    def _verifica(token_data: TokenData = Depends(obter_usuario_atual)) -> TokenData:
+        if token_data.role not in papeis_permitidos:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Acesso negado. Requer papel: {' ou '.join(papeis_permitidos)}."
+            )
+        return token_data
+    return _verifica
+
 # ==================== Endpoints de Autenticação ====================
 
 @app.post("/api/login", response_model=Token)
@@ -92,28 +104,19 @@ def login(credenciais: UsuarioLogin):
         "usuario": usuario
     }
 
-@app.post("/api/registrar", response_model=Token)
-def registrar(dados: UsuarioRegistro):
-    """Registra um novo usuário."""
+@app.post("/api/registrar")
+def registrar(dados: UsuarioRegistro,
+              token_data: TokenData = Depends(exigir_papel("analista", "admin"))):
+    """Cadastra um novo cliente. Restrito a analista/admin (autocadastro público desativado)."""
     usuario = registrar_usuario(dados.email, dados.nome, dados.senha)
-    
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email já cadastrado"
         )
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = criar_token_acesso(
-        data={"sub": usuario["email"], "role": usuario["role"]},
-        expires_delta=access_token_expires
-    )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "usuario": usuario
-    }
+    return {"status": "sucesso",
+            "mensagem": f"Cliente {usuario['email']} cadastrado por {token_data.email}.",
+            "usuario": usuario}
 
 @app.get("/api/perfil", response_model=Usuario)
 def obter_perfil(token_data: TokenData = Depends(obter_usuario_atual)):
@@ -148,7 +151,7 @@ def carregar_base_clientes():
         return None
 
 @app.get("/api/clientes")
-def listar_clientes(token_data: TokenData = Depends(obter_usuario_atual), limite: int = 100):
+def listar_clientes(token_data: TokenData = Depends(exigir_papel("analista", "admin")), limite: int = 100):
     """Lista clientes cadastrados."""
     df = carregar_base_clientes()
     if df is None:
@@ -166,7 +169,7 @@ def listar_clientes(token_data: TokenData = Depends(obter_usuario_atual), limite
     }
 
 @app.get("/api/clientes/{cliente_id}")
-def obter_cliente(cliente_id: str, token_data: TokenData = Depends(obter_usuario_atual)):
+def obter_cliente(cliente_id: str, token_data: TokenData = Depends(exigir_papel("analista", "admin"))):
     """Obtém detalhes de um cliente específico."""
     df = carregar_base_clientes()
     if df is None:
@@ -187,7 +190,7 @@ def obter_cliente(cliente_id: str, token_data: TokenData = Depends(obter_usuario
     return {"cliente": cliente}
 
 @app.get("/api/clientes/estatisticas/resumo")
-def obter_estatisticas_clientes(token_data: TokenData = Depends(obter_usuario_atual)):
+def obter_estatisticas_clientes(token_data: TokenData = Depends(exigir_papel("analista", "admin"))):
     """Obtém estatísticas gerais dos clientes."""
     df = carregar_base_clientes()
     if df is None:
@@ -212,7 +215,7 @@ def obter_estatisticas_clientes(token_data: TokenData = Depends(obter_usuario_at
 # ==================== Endpoints de Análise (Scoring) ====================
 
 @app.post("/api/analisar-transacao")
-def analisar_transacao(token_data: TokenData = Depends(obter_usuario_atual), features: dict = None, meta: dict = None):
+def analisar_transacao(token_data: TokenData = Depends(exigir_papel("analista", "admin")), features: dict = None, meta: dict = None):
     """Analisa uma transação individual."""
     cfg = obter_config()
     

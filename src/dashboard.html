@@ -446,7 +446,7 @@
             <i class="bi bi-lock"></i> Entrar
           </button>
           <div class="toggle-auth">
-            Novo usuário? <a onclick="mostrarRegistro()">Criar conta</a>
+            <span style="color:#888;font-size:0.9em">O cadastro de clientes é feito por um analista.</span>
           </div>
         </div>
 
@@ -539,18 +539,22 @@
         <div style="width: 250px">
           <div class="sidebar">
             <div
+              id="navDashboard"
               class="sidebar-item active"
               onclick="mostrarSecao('dashboard')"
             >
               <i class="bi bi-speedometer2"></i> Dashboard
             </div>
-            <div class="sidebar-item" onclick="mostrarSecao('clientes')">
+            <div id="navClientes" class="sidebar-item" onclick="mostrarSecao('clientes')">
               <i class="bi bi-people"></i> Clientes
             </div>
-            <div class="sidebar-item" onclick="mostrarSecao('analisar')">
+            <div id="navAnalisar" class="sidebar-item" onclick="mostrarSecao('analisar')">
               <i class="bi bi-search"></i> Analisar Transação
             </div>
-            <div class="sidebar-item" onclick="mostrarSecao('perfil')">
+            <div id="navCadastrar" class="sidebar-item" onclick="mostrarSecao('cadastrar')">
+              <i class="bi bi-person-plus"></i> Cadastrar Cliente
+            </div>
+            <div id="navPerfil" class="sidebar-item" onclick="mostrarSecao('perfil')">
               <i class="bi bi-person"></i> Meu Perfil
             </div>
           </div>
@@ -750,6 +754,37 @@
               </div>
             </div>
 
+            <!-- Cadastrar Cliente Section (somente analista/admin) -->
+            <div id="cadastrarSection" class="page-section">
+              <h2
+                style="
+                  margin-bottom: 30px;
+                  color: var(--secondary-color);
+                  font-weight: 700;
+                "
+              >
+                <i class="bi bi-person-plus"></i> Cadastrar Cliente
+              </h2>
+              <div class="form-section">
+                <div id="cadastroAlert" style="display: none"></div>
+                <div class="form-group">
+                  <label class="form-label">Nome completo</label>
+                  <input type="text" id="cadNome" class="form-control" placeholder="Nome do cliente" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">E-mail</label>
+                  <input type="email" id="cadEmail" class="form-control" placeholder="email@exemplo.com" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Senha provisória</label>
+                  <input type="password" id="cadSenha" class="form-control" placeholder="Senha inicial do cliente" />
+                </div>
+                <button type="button" onclick="realizarCadastroCliente()" class="btn btn-primary" style="width: 100%; margin-top: 10px">
+                  <i class="bi bi-person-plus"></i> Cadastrar Cliente
+                </button>
+              </div>
+            </div>
+
             <!-- Perfil Section -->
             <div id="perfilSection" class="page-section">
               <h2
@@ -878,6 +913,46 @@
         }
       }
 
+      function _alertaCadastro(msg, ok) {
+        const a = document.getElementById("cadastroAlert")
+        a.style.display = "block"
+        a.textContent = msg
+        a.style.padding = "10px 14px"
+        a.style.borderRadius = "8px"
+        a.style.marginBottom = "15px"
+        a.style.fontWeight = "600"
+        a.style.background = ok ? "#e6f4ea" : "#fde8e8"
+        a.style.color = ok ? "#1e7e34" : "#b02a37"
+      }
+
+      async function realizarCadastroCliente() {
+        const nome = document.getElementById("cadNome").value
+        const email = document.getElementById("cadEmail").value
+        const senha = document.getElementById("cadSenha").value
+        if (!nome || !email || !senha) {
+          _alertaCadastro("Preencha nome, e-mail e senha.", false)
+          return
+        }
+        try {
+          const resp = await fetch("/api/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", token: token },
+            body: JSON.stringify({ email, nome, senha }),
+          })
+          const data = await resp.json()
+          if (resp.ok) {
+            _alertaCadastro(data.mensagem || "Cliente cadastrado com sucesso.", true)
+            document.getElementById("cadNome").value = ""
+            document.getElementById("cadEmail").value = ""
+            document.getElementById("cadSenha").value = ""
+          } else {
+            _alertaCadastro(data.detail || "Erro ao cadastrar cliente.", false)
+          }
+        } catch (e) {
+          _alertaCadastro("Erro de conexão: " + e.message, false)
+        }
+      }
+
       function realizarLogout() {
         token = null
         usuarioAtual = {}
@@ -919,13 +994,34 @@
         document.getElementById("userAvatar").textContent = avatar
         document.getElementById("userName").textContent =
           usuarioAtual.nome || "Usuário"
-        document.getElementById("userRole").textContent =
-          usuarioAtual.role || "Cliente"
+        const papel = (usuarioAtual.role || "cliente").toLowerCase()
+        document.getElementById("userRole").textContent = papel
+        const ehAnalista = papel === "analista" || papel === "admin"
 
-        // Carregar dados iniciais
-        carregarEstatisticas()
-        carregarClientes()
+        // Mostra/oculta itens do menu conforme o papel (servidor também bloqueia)
+        document.getElementById("navDashboard").style.display = ehAnalista ? "" : "none"
+        document.getElementById("navClientes").style.display = ehAnalista ? "" : "none"
+        document.getElementById("navAnalisar").style.display = ehAnalista ? "" : "none"
+        document.getElementById("navCadastrar").style.display = ehAnalista ? "" : "none"
+
         carregarPerfil()
+        if (ehAnalista) {
+          carregarEstatisticas()
+          carregarClientes()
+        } else {
+          // Cliente: sem acesso a análise/base — abre direto em Meu Perfil
+          irParaSecao("perfil")
+        }
+      }
+
+      // Ativa uma seção sem depender de um evento de clique
+      function irParaSecao(secao) {
+        document.querySelectorAll(".page-section").forEach((el) => el.classList.remove("active"))
+        document.querySelectorAll(".sidebar-item").forEach((el) => el.classList.remove("active"))
+        const secaoEl = document.getElementById(secao + "Section")
+        if (secaoEl) secaoEl.classList.add("active")
+        const nav = document.getElementById("nav" + secao.charAt(0).toUpperCase() + secao.slice(1))
+        if (nav) nav.classList.add("active")
       }
 
       function mostrarSecao(secao) {
