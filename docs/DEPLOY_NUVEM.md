@@ -21,9 +21,11 @@ cold start fica ruim. Use o Vercel **só para o frontend**, apontando para a API
    ```
    (Fly.io e Cloud Run enviam os arquivos locais e dispensam esse passo.)
 
-## Variável de ambiente obrigatória em produção
-- `SECRET_KEY` → chave de assinatura dos tokens JWT. Defina um valor forte
-  (no Render o `render.yaml` já gera automaticamente).
+## Variáveis de ambiente em produção (segurança)
+Defina no painel do host (Render/Railway/Fly/Cloud Run):
+- `SECRET_KEY` → chave de assinatura dos tokens JWT (valor forte; no Render o `render.yaml` já gera).
+- `ADMIN_PASSWORD`, `ANALISTA_PASSWORD`, `CLIENTE_PASSWORD` → **troque as senhas padrão**.
+  Sem isso, valem as senhas de desenvolvimento (admin123, etc.) e qualquer um que as conheça entra.
 
 ---
 
@@ -73,3 +75,21 @@ Use isto só se quiser o frontend separado da API.
 ## Dica de custo
 Para um piloto/demonstração, **Render Free** ou **Fly.io** resolvem sem custo.
 Para produção 24/7 com baixa latência, prefira **Cloud Run** ou um plano pago do Render/Railway.
+
+## Banco de usuários (PostgreSQL em produção, SQLite local)
+A autenticação usa um banco real com **salt individual por senha**. O backend é escolhido
+automaticamente:
+- **Com `DATABASE_URL` definida** (ex.: PostgreSQL do Render) → usa **PostgreSQL**.
+- **Sem `DATABASE_URL`** (ambiente local) → usa **SQLite** em `data/fraudshield.db`.
+
+### Render (já automatizado pelo `render.yaml`)
+O blueprint provisiona um **PostgreSQL grátis** (`fraudshield-db`) e injeta a `DATABASE_URL`
+no serviço. Assim, os usuários cadastrados **persistem** entre deploys/reinícios.
+Basta o **New → Blueprint** apontando para o repositório.
+
+### Primeiro acesso e segurança
+- Na primeira subida é criado um **admin** (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
+- `SEED_DEMO=0` (padrão de produção) **não** cria os usuários de demonstração.
+  Para popular o admin, defina `ADMIN_EMAIL` e `ADMIN_PASSWORD` no painel.
+- Em outros hosts (Railway/Fly/Cloud Run), crie um PostgreSQL e defina `DATABASE_URL`
+  no serviço; o resto funciona igual. A dependência `psycopg[binary]` já está no `requirements.txt`.

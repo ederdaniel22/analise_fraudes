@@ -18,3 +18,5 @@ PyJWT>=2.8
 twilio>=9.2            # WhatsApp
 # (e-mail usa smtplib da stdlib)
 pytho
+# Banco PostgreSQL (produção); local usa SQLite da stdlib
+psycopg[binary]>=3.1
