@@ -1,0 +1,12 @@
+services:
+  fraudshield-api:
+    build: .
+    ports:
+      - "8001:8000"
+    env_file:
+      - path: .env
+        required: false      # .env é opcional (alertas reais). Sem ele, roda em simulação.
+    volumes:
+      - ./models:/app/models
+      - ./config:/app/config
+    restart: unless-stopped

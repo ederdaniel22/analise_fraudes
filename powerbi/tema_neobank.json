@@ -1,0 +1,7 @@
+{
+  "name": "FraudShield",
+  "dataColors": ["#1B3A6B","#2E9CCA","#E4572E","#F3A712","#2A9D8F","#6c757d"],
+  "background": "#FFFFFF",
+  "foreground": "#1B3A6B",
+  "tableAccent": "#2E9CCA"
+}

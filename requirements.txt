@@ -1,0 +1,20 @@
+# FraudShield - dependências
+# Versões mínimas (>=) para o pip baixar wheels prontos e evitar compilação.
+pandas>=2.2.3
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.8
+seaborn>=0.13
+joblib>=1.4
+pyyaml>=6.0
+imbalanced-learn>=0.12
+# API / tempo real
+fastapi>=0.111
+uvicorn>=0.30
+pydantic>=2.7
+python-multipart>=0.0.6
+PyJWT>=2.8
+# Alertas
+twilio>=9.2            # WhatsApp
+# (e-mail usa smtplib da stdlib)
+pytho

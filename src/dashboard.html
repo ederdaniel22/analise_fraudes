@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FraudShield - Sistema de Detecção de Fraudes</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #1e40af;
+        --secondary-color: #0f172a;
+        --accent-color: #f59e0b;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--secondary-color) 0%,
+          var(--primary-color) 100%
+        );
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Login Screen */
+      .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        animation: slideIn 0.5s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .logo {
+        font-size: 3em;
+        margin-bottom: 15px;
+      }
+
+      .login-header h1 {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 28px;
+        margin-bottom: 5px;
+      }
+
+      .login-header p {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-control {
+        padding: 12px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          #1e3a8a 100%
+        );
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(30, 64, 175, 0.3);
+      }
+
+      .toggle-auth {
+        text-align: center;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .toggle-auth a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .toggle-auth a:hover {
+        text-decoration: underline;
+      }
+
+      .alert-message {
+        margin-bottom: 20px;
+        padding: 12px 15px;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .alert-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      /* Dashboard */
+      .dashboard-container {
+        display: none;
+        background: #f3f4f6;
+        min-height: 100vh;
+      }
+
+      .navbar-dashboard {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 1rem 0;
+      }
+
+      .navbar-brand-dashboard {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .sidebar {
+        background: white;
+        height: calc(100vh - 70px);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        padding: 20px 0;
+        overflow-y: auto;
+      }
+
+      .sidebar-item {
+        padding: 15px 25px;
+        cursor: pointer;
+        color: #6b7280;
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .sidebar-item:hover {
+        background: #f3f4f6;
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+      }
+
+      .sidebar-item.active {
+        background: #eff6ff;
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+      }
+
+      .main-content {
+        padding: 30px;
+      }
+
+      .page-section {
+        display: none;
+      }
+
+      .page-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .card-stat {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .card-stat h3 {
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+
+      .card-stat .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .card-stat.danger {
+        border-left-color: var(--danger-color);
+      }
+
+      .card-stat.danger .stat-value {
+        color: var(--danger-color);
+      }
+
+      .card-stat.success {
+        border-left-color: var(--success-color);
+      }
+
+      .card-stat.success .stat-value {
+        color: var(--success-color);
+      }
+
+      .table-responsive {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .table {
+        margin-bottom: 0;
+      }
+
+      .table thead {
+        background: #f3f4f6;
+      }
+
+      .table th {
+        border: none;
+        color: #6b7280;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        padding: 15px;
+      }
+
+      .table td {
+        border: none;
+        padding: 15px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .badge-fraud {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .badge-safe {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .form-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), #1e3a8a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 20px;
+      }
+
+      .logout-btn {
+        background: var(--danger-color);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+      }
+
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 40px;
+      }
+
+      .loading-spinner.show {
+        display: block;
+      }
+
+      .spinner-border {
+        color: var(--primary-color);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .login-card {
+          padding: 30px 20px;
+        }
+
+        .sidebar {
+          display: none;
+        }
+
+        .main-content {
+          padding: 20px;
+        }
+
+        .card-stat {
+          padding: 15px;
+        }
+
+        .card-stat .stat-value {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="logo">🏦</div>
+          <h1>FraudShield</h1>
+          <p>Sistema de Detecção de Fraudes</p>
+        </div>
+
+        <div id="loginAlert" class="alert-message alert-danger"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div class="form-group">
+            <input
+              type="email"
+              id="loginEmail"
+              class="form-control"
+              placeholder="E-mail"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="loginPassword"
+              class="form-control"
+              placeholder="Senha"
+              required
+            />
+          </div>
+          <button onclick="realizarLogin()" class="btn-login">
+            <i class="bi bi-lock"></i> Entrar
+          </button>
+          <div class="toggle-auth">
+            Novo usuário? <a onclick="mostrarRegistro()">Criar conta</a>
+          </div>
+        </div>
+
+        <!-- Register Form (Hidden) -->
+        <div id="registerForm" style="display: none">
+          <div class="form-group">
+            <input
+              type="text"
+              id="registerName"
+              class="form-control"
+              placeholder="Nome completo"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="email"
+              id="registerEmail"
+              class="form-control"
+              placeholder="E-mail"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="registerPassword"
+              class="form-control"
+              placeholder="Senha"
+              required
+            />
+          </div>
+          <button onclick="realizarRegistro()" class="btn-login">
+            <i class="bi bi-person-plus"></i> Criar Conta
+          </button>
+          <div class="toggle-auth">
+            Já tem conta? <a onclick="mostrarLogin()">Fazer login</a>
+          </div>
+        </div>
+
+        <div
+          style="
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #9ca3af;
+            text-align: center;
+          "
+        >
+          <p><strong>Credenciais de Demonstração:</strong></p>
+          <p>Admin: admin@neobank.com / admin123</p>
+          <p>Analista: analista@neobank.com / analista123</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboardScreen" class="dashboard-container">
+      <!-- Navbar -->
+      <nav class="navbar-dashboard">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="navbar-brand-dashboard">
+              <i class="bi bi-shield-check"></i> FraudShield
+            </div>
+            <div class="user-profile">
+              <div class="user-avatar" id="userAvatar">A</div>
+              <div>
+                <div
+                  style="font-weight: 600; color: var(--secondary-color)"
+                  id="userName"
+                >
+                  Usuário
+                </div>
+                <div style="font-size: 12px; color: #9ca3af" id="userRole">
+                  Role
+                </div>
+              </div>
+              <button class="logout-btn" onclick="realizarLogout()">
+                <i class="bi bi-box-arrow-right"></i> Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="d-flex" style="height: calc(100vh - 70px)">
+        <!-- Sidebar -->
+        <div style="width: 250px">
+          <div class="sidebar">
+            <div
+              class="sidebar-item active"
+              onclick="mostrarSecao('dashboard')"
+            >
+              <i class="bi bi-speedometer2"></i> Dashboard
+            </div>
+            <div class="sidebar-item" onclick="mostrarSecao('clientes')">
+              <i class="bi bi-people"></i> Clientes
+            </div>
+            <div class="sidebar-item" onclick="mostrarSecao('analisar')">
+              <i class="bi bi-search"></i> Analisar Transação
+            </div>
+            <div class="sidebar-item" onclick="mostrarSecao('perfil')">
+              <i class="bi bi-person"></i> Meu Perfil
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div style="flex: 1; overflow-y: auto">
+          <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="page-section active">
+              <h2
+                style="
+                  margin-bottom: 30px;
+                  color: var(--secondary-color);
+                  font-weight: 700;
+                "
+              >
+                <i class="bi bi-speedometer2"></i> Dashboard
+              </h2>
+
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="card-stat">
+                    <h3>Total de Clientes</h3>
+                    <div class="stat-value" id="totalClientes">0</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card-stat danger">
+                    <h3>Fraudes Detectadas</h3>
+                    <div class="stat-value" id="totalFraudes">0</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card-stat success">
+                    <h3>Valor Médio</h3>
+                    <div class="stat-value" id="valorMedio">R$ 0</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card-stat">
+                    <h3>Valor Total</h3>
+                    <div class="stat-value" id="valorTotal">R$ 0</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 30px">
+                <button
+                  onclick="carregarEstatisticas()"
+                  class="btn btn-primary"
+                >
+                  <i class="bi bi-arrow-repeat"></i> Atualizar Dados
+                </button>
+              </div>
+            </div>
+
+            <!-- Clientes Section -->
+            <div id="clientesSection" class="page-section">
+              <h2
+                style="
+                  margin-bottom: 30px;
+                  color: var(--secondary-color);
+                  font-weight: 700;
+                "
+              >
+                <i class="bi bi-people"></i> Gestão de Clientes
+              </h2>
+
+              <div style="margin-bottom: 20px">
+                <input
+                  type="text"
+                  id="searchClientes"
+                  class="form-control"
+                  placeholder="Buscar cliente..."
+                />
+              </div>
+
+              <div id="clientesLoading" class="loading-spinner">
+                <div class="spinner-border" role="status"></div>
+                <p>Carregando clientes...</p>
+              </div>
+
+              <div
+                id="clientesTable"
+                class="table-responsive"
+                style="display: none"
+              >
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>ID da Conta</th>
+                      <th>Valor</th>
+                      <th>Status</th>
+                      <th>Tipo</th>
+                      <th>Hora</th>
+                    </tr>
+                  </thead>
+                  <tbody id="clientesTableBody"></tbody>
+                </table>
+              </div>
+
+              <div id="clientesEmpty" class="empty-state" style="display: none">
+                <i class="bi bi-inbox"></i>
+                <h4>Nenhum cliente encontrado</h4>
+              </div>
+            </div>
+
+            <!-- Analisar Transação Section -->
+            <div id="analisarSection" class="page-section">
+              <h2
+                style="
+                  margin-bottom: 30px;
+                  color: var(--secondary-color);
+                  font-weight: 700;
+                "
+              >
+                <i class="bi bi-search"></i> Analisar Transação
+              </h2>
+
+              <div class="form-section">
+                <form id="transacaoForm">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="txAmount" class="form-label"
+                          >Valor da Transação</label
+                        >
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="txAmount"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="txChannel" class="form-label">Canal</label>
+                        <select class="form-control" id="txChannel" required>
+                          <option>ATM</option>
+                          <option>Online</option>
+                          <option>POS</option>
+                          <option>Mobile</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="txType" class="form-label"
+                          >Tipo de Transação</label
+                        >
+                        <select class="form-control" id="txType" required>
+                          <option>Transfer</option>
+                          <option>Debit</option>
+                          <option>Withdrawal</option>
+                          <option>Purchase</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="txLocation" class="form-label"
+                          >Localização</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="txLocation"
+                          placeholder="Cidade/Estado"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onclick="analisarTransacao()"
+                    class="btn btn-primary"
+                    style="width: 100%"
+                  >
+                    <i class="bi bi-play-circle"></i> Analisar
+                  </button>
+                </form>
+
+                <div
+                  id="resultadoAnalise"
+                  style="margin-top: 30px; display: none"
+                >
+                  <div id="resultadoConteudo"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Perfil Section -->
+            <div id="perfilSection" class="page-section">
+              <h2
+                style="
+                  margin-bottom: 30px;
+                  color: var(--secondary-color);
+                  font-weight: 700;
+                "
+              >
+                <i class="bi bi-person"></i> Meu Perfil
+              </h2>
+
+              <div class="form-section">
+                <div class="mb-3">
+                  <label class="form-label">Nome</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="perfilNome"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">E-mail</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="perfilEmail"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Função</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="perfilRole"
+                    readonly
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Status</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="perfilStatus"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Estado global
+      let token = localStorage.getItem("token")
+      let usuarioAtual = JSON.parse(localStorage.getItem("usuario") || "{}")
+
+      // Funções de Autenticação
+      async function realizarLogin() {
+        const email = document.getElementById("loginEmail").value
+        const senha = document.getElementById("loginPassword").value
+
+        if (!email || !senha) {
+          mostrarAlerta("Por favor preencha todos os campos", "login")
+          return
+        }
+
+        try {
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha }),
+          })
+
+          const data = await response.json()
+
+          if (response.ok) {
+            token = data.access_token
+            usuarioAtual = data.usuario
+            localStorage.setItem("token", token)
+            localStorage.setItem("usuario", JSON.stringify(usuarioAtual))
+            inicializarDashboard()
+          } else {
+            mostrarAlerta(data.detail || "Erro ao fazer login", "login")
+          }
+        } catch (error) {
+          mostrarAlerta("Erro de conexão: " + error.message, "login")
+        }
+      }
+
+      async function realizarRegistro() {
+        const email = document.getElementById("registerEmail").value
+        const nome = document.getElementById("registerName").value
+        const senha = document.getElementById("registerPassword").value
+
+        if (!email || !nome || !senha) {
+          mostrarAlerta("Por favor preencha todos os campos", "login")
+          return
+        }
+
+        try {
+          const response = await fetch("/api/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, nome, senha }),
+          })
+
+          const data = await response.json()
+
+          if (response.ok) {
+            token = data.access_token
+            usuarioAtual = data.usuario
+            localStorage.setItem("token", token)
+            localStorage.setItem("usuario", JSON.stringify(usuarioAtual))
+            inicializarDashboard()
+          } else {
+            mostrarAlerta(data.detail || "Erro ao criar conta", "login")
+          }
+        } catch (error) {
+          mostrarAlerta("Erro de conexão: " + error.message, "login")
+        }
+      }
+
+      function realizarLogout() {
+        token = null
+        usuarioAtual = {}
+        localStorage.removeItem("token")
+        localStorage.removeItem("usuario")
+        document.getElementById("loginScreen").style.display = "flex"
+        document.getElementById("dashboardScreen").style.display = "none"
+        document.getElementById("loginForm").style.display = "block"
+        document.getElementById("registerForm").style.display = "none"
+      }
+
+      function mostrarLogin() {
+        document.getElementById("loginForm").style.display = "block"
+        document.getElementById("registerForm").style.display = "none"
+      }
+
+      function mostrarRegistro() {
+        document.getElementById("loginForm").style.display = "none"
+        document.getElementById("registerForm").style.display = "block"
+      }
+
+      function mostrarAlerta(mensagem, tela = "login") {
+        const alerta = document.getElementById(tela + "Alert")
+        if (alerta) {
+          alerta.textContent = mensagem
+          alerta.style.display = "block"
+        }
+      }
+
+      // Dashboard
+      function inicializarDashboard() {
+        document.getElementById("loginScreen").style.display = "none"
+        document.getElementById("dashboardScreen").style.display = "block"
+
+        // Atualizar perfil
+        const avatar = usuarioAtual.nome
+          ? usuarioAtual.nome.charAt(0).toUpperCase()
+          : "U"
+        document.getElementById("userAvatar").textContent = avatar
+        document.getElementById("userName").textContent =
+          usuarioAtual.nome || "Usuário"
+        document.getElementById("userRole").textContent =
+          usuarioAtual.role || "Cliente"
+
+        // Carregar dados iniciais
+        carregarEstatisticas()
+        carregarClientes()
+        carregarPerfil()
+      }
+
+      function mostrarSecao(secao) {
+        // Ocultar todas as seções
+        document
+          .querySelectorAll(".page-section")
+          .forEach((el) => el.classList.remove("active"))
+        document
+          .querySelectorAll(".sidebar-item")
+          .forEach((el) => el.classList.remove("active"))
+
+        // Mostrar seção selecionada
+        const secaoEl = document.getElementById(secao + "Section")
+        if (secaoEl) {
+          secaoEl.classList.add("active")
+        }
+
+        // Marcar sidebar item como ativo
+        event.target.closest(".sidebar-item")?.classList.add("active")
+
+        // Carregar dados específicos
+        if (secao === "clientes") {
+          carregarClientes()
+        } else if (secao === "perfil") {
+          carregarPerfil()
+        }
+      }
+
+      async function carregarEstatisticas() {
+        try {
+          const response = await fetch("/api/clientes/estatisticas/resumo", {
+            headers: { token: token },
+          })
+          const data = await response.json()
+
+          document.getElementById("totalClientes").textContent =
+            data.total_clientes.toLocaleString("pt-BR")
+          document.getElementById("totalFraudes").textContent =
+            data.fraudes_detectadas.toLocaleString("pt-BR")
+          document.getElementById("valorMedio").textContent =
+            "R$ " +
+            data.valor_medio_transacao.toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })
+          document.getElementById("valorTotal").textContent =
+            "R$ " +
+            data.valor_total.toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })
+        } catch (error) {
+          console.error("Erro ao carregar estatísticas:", error)
+        }
+      }
+
+      async function carregarClientes() {
+        document.getElementById("clientesLoading").classList.add("show")
+        document.getElementById("clientesTable").style.display = "none"
+        document.getElementById("clientesEmpty").style.display = "none"
+
+        try {
+          const response = await fetch("/api/clientes?limite=50", {
+            headers: { token: token },
+          })
+          const data = await response.json()
+
+          const tbody = document.getElementById("clientesTableBody")
+          tbody.innerHTML = ""
+
+          if (data.clientes && data.clientes.length > 0) {
+            data.clientes.forEach((cliente) => {
+              const row = `
+                            <tr>
+                                <td><strong>${cliente.AccountID || "N/A"}</strong></td>
+                                <td>R$ ${(cliente.Amount || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                                <td><span class="badge ${cliente.isFraud ? "badge-fraud" : "badge-safe"}">${cliente.isFraud ? "Fraude" : "Seguro"}</span></td>
+                                <td>${cliente.Transaction_Type || "N/A"}</td>
+                                <td>${cliente.Time || "N/A"}</td>
+                            </tr>
+                        `
+              tbody.innerHTML += row
+            })
+            document.getElementById("clientesTable").style.display = "block"
+          } else {
+            document.getElementById("clientesEmpty").style.display = "block"
+          }
+        } catch (error) {
+          console.error("Erro ao carregar clientes:", error)
+          document.getElementById("clientesEmpty").style.display = "block"
+        } finally {
+          document.getElementById("clientesLoading").classList.remove("show")
+        }
+      }
+
+      async function analisarTransacao() {
+        const amount = parseFloat(document.getElementById("txAmount").value)
+        const channel = document.getElementById("txChannel").value
+        const type = document.getElementById("txType").value
+        const location = document.getElementById("txLocation").value
+
+        if (!amount || !channel || !type || !location) {
+          alert("Por favor preencha todos os campos")
+          return
+        }
+
+        try {
+          const response = await fetch("/api/analisar-transacao", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: token,
+            },
+            body: JSON.stringify({
+              features: {
+                V1: Math.random() * 2 - 1,
+                V2: Math.random() * 2 - 1,
+                V3: Math.random() * 2 - 1,
+                Amount: amount,
+                Time: Date.now() / 1000,
+              },
+              meta: {
+                Channel: channel,
+                Transaction_Type: type,
+                Location: location,
+              },
+            }),
+          })
+
+          const data = await response.json()
+          const resultado = data.resultado
+
+          const html = `
+                    <div class="alert ${resultado.alerta ? "alert-danger" : "alert-success"}">
+                        <h4>${resultado.alerta ? "🚨 Transação Suspeita" : "✅ Transação Segura"}</h4>
+                        <p><strong>Score de Fraude:</strong> ${(resultado.score * 100).toFixed(2)}%</p>
+                        <p><strong>Tipo de Fraude Detectado:</strong> ${resultado.tipo_fraude || "Nenhum"}</p>
+                        <p><strong>Valor:</strong> R$ ${amount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                    </div>
+                `
+
+          document.getElementById("resultadoConteudo").innerHTML = html
+          document.getElementById("resultadoAnalise").style.display = "block"
+        } catch (error) {
+          alert("Erro ao analisar: " + error.message)
+        }
+      }
+
+      async function carregarPerfil() {
+        document.getElementById("perfilNome").value = usuarioAtual.nome || ""
+        document.getElementById("perfilEmail").value = usuarioAtual.email || ""
+        document.getElementById("perfilRole").value = usuarioAtual.role || ""
+        document.getElementById("perfilStatus").value = "Ativo"
+      }
+
+      // Inicialização
+      window.addEventListener("load", () => {
+        if (token && usuarioAtual.email) {
+          inicializarDashboard()
+        }
+      })
+    </script>
+  </body>
+</html>

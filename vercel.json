@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "SISTEMA_LOGIN.html", "use": "@vercel/static" },
+    { "src": "src/dashboard.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/SISTEMA_LOGIN.html" },
+    { "src": "/dashboard", "dest": "/src/dashboard.html" }
+  ]
+}

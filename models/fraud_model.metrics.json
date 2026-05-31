@@ -1,0 +1,63 @@
+{
+  "roc_auc": 0.9598,
+  "pr_auc": 0.8505,
+  "precision": 0.9798,
+  "recall": 0.6554,
+  "f1": 0.7854,
+  "limiar": 0.8,
+  "n_treino": 42344,
+  "n_teste": 18148,
+  "taxa_fraude": 0.00813,
+  "matriz_confusao": [
+    [
+      17998,
+      2
+    ],
+    [
+      51,
+      97
+    ]
+  ],
+  "top_features": [
+    {
+      "feature": "V14",
+      "importancia": 0.1823
+    },
+    {
+      "feature": "V10",
+      "importancia": 0.138
+    },
+    {
+      "feature": "V12",
+      "importancia": 0.1152
+    },
+    {
+      "feature": "V4",
+      "importancia": 0.0969
+    },
+    {
+      "feature": "V17",
+      "importancia": 0.0842
+    },
+    {
+      "feature": "V11",
+      "importancia": 0.054
+    },
+    {
+      "feature": "V3",
+      "importancia": 0.0516
+    },
+    {
+      "feature": "V16",
+      "importancia": 0.0502
+    },
+    {
+      "feature": "V2",
+      "importancia": 0.0343
+    },
+    {
+      "feature": "V7",
+      "importancia": 0.0255
+    }
+  ]
+}

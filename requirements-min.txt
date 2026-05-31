@@ -1,0 +1,7 @@
+# Mínimo para 'python -m src.main tudo' (treino + gráficos + Power BI)
+pandas>=2.2.3
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.8
+joblib>=1.4
+pyyaml>=6.0

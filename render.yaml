@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: fraudshield-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true        # chave JWT gerada automaticamente em produção
+      - key: PORT
+        value: 8000

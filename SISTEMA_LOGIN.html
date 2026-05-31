@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Login & API - FraudShield</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e40af 0%, #0f172a 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+
+      h1 {
+        color: #1e40af;
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: #6b7280;
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+
+      .card h2 {
+        color: #1e40af;
+        font-size: 22px;
+        margin-bottom: 10px;
+      }
+
+      .card p {
+        color: #6b7280;
+        line-height: 1.6;
+      }
+
+      .features {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .features h2 {
+        color: #1e40af;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      .feature-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .feature-item {
+        padding: 15px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        border-left: 4px solid #1e40af;
+      }
+
+      .feature-item h3 {
+        color: #1e40af;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .feature-item p {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .credentials {
+        background: #eff6ff;
+        border-left: 4px solid #1e40af;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .credentials h3 {
+        color: #1e40af;
+        margin-bottom: 15px;
+      }
+
+      .credential-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      .credential-table th,
+      .credential-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .credential-table th {
+        background: #f3f4f6;
+        font-weight: 600;
+        color: #1e40af;
+      }
+
+      .files {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .files h2 {
+        color: #1e40af;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      .file-category {
+        margin-bottom: 25px;
+      }
+
+      .file-category h3 {
+        color: #1e40af;
+        font-size: 18px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #eff6ff;
+      }
+
+      .file-item {
+        padding: 12px;
+        margin: 8px 0;
+        background: #f3f4f6;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .file-item strong {
+        color: #1e40af;
+      }
+
+      .file-item p {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .cta-section {
+        background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .cta-section h2 {
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+
+      .commands {
+        background: #1a1f2e;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .command-box {
+        background: #0f172a;
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 3px solid #f59e0b;
+      }
+
+      .command-box h4 {
+        color: #f59e0b;
+        margin-bottom: 8px;
+      }
+
+      .command-box code {
+        color: #a3e635;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .button {
+        display: inline-block;
+        background: #f59e0b;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      .button:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+      }
+
+      footer {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        color: #6b7280;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .status-badge {
+        display: inline-block;
+        background: #dcfce7;
+        color: #166534;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="status-badge">✅ SISTEMA CRIADO COM SUCESSO</div>
+        <h1>🏦 Sistema de Login & API</h1>
+        <p class="subtitle">
+          FraudShield - Interface Web com Autenticação JWT
+        </p>
+      </header>
+
+      <div class="grid">
+        <div class="card">
+          <div class="card-icon">🔐</div>
+          <h2>Autenticação JWT</h2>
+          <p>
+            Sistema completo de login e registro com tokens JWT seguros e senhas
+            criptografadas.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🎨</div>
+          <h2>Dashboard Web</h2>
+          <p>
+            Interface moderna e responsiva construída com HTML5, CSS3 e
+            JavaScript vanilla.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h2>API REST</h2>
+          <p>
+            API FastAPI completa com endpoints para autenticação, clientes e
+            análise de transações.
+          </p>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>🚀 Comece Agora!</h2>
+        <p style="margin-bottom: 20px; font-size: 18px">
+          Inicie o servidor e acesse o dashboard em segundos
+        </p>
+
+        <div class="commands">
+          <div class="command-box">
+            <h4>Windows</h4>
+            <code>iniciar_api.bat</code>
+          </div>
+          <div class="command-box">
+            <h4>Linux/Mac</h4>
+            <code>bash iniciar_api.sh</code>
+          </div>
+          <div class="command-box">
+            <h4>Manual</h4>
+            <code>python main_api.py</code>
+          </div>
+        </div>
+
+        <p style="margin-top: 20px; font-size: 16px">
+          Depois acesse: <strong>http://localhost:8000</strong>
+        </p>
+        <a href="http://localhost:8000" class="button" target="_blank"
+          >Abrir Dashboard</a
+        >
+      </div>
+
+      <div class="credentials">
+        <h3>👤 Credenciais de Teste (Pré-configuradas)</h3>
+        <table class="credential-table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Senha</th>
+              <th>Função</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>admin@neobank.com</strong></td>
+              <td><code>admin123</code></td>
+              <td>Administrador</td>
+            </tr>
+            <tr>
+              <td><strong>analista@neobank.com</strong></td>
+              <td><code>analista123</code></td>
+              <td>Analista de Fraude</td>
+            </tr>
+            <tr>
+              <td><strong>cliente@neobank.com</strong></td>
+              <td><code>cliente123</code></td>
+              <td>Cliente</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="features">
+        <h2>✨ Funcionalidades do Dashboard</h2>
+        <div class="feature-list">
+          <div class="feature-item">
+            <h3>📊 Dashboard</h3>
+            <p>Estatísticas em tempo real com 4 cards de dados principais.</p>
+          </div>
+          <div class="feature-item">
+            <h3>👥 Clientes</h3>
+            <p>Lista completa de clientes com informações de transações.</p>
+          </div>
+          <div class="feature-item">
+            <h3>🔍 Análise</h3>
+            <p>Formulário para análise manual de transações suspeitas.</p>
+          </div>
+          <div class="feature-item">
+            <h3>🎯 Alertas</h3>
+            <p>Sistema de alertas quando fraude é detectada.</p>
+          </div>
+          <div class="feature-item">
+            <h3>👤 Perfil</h3>
+            <p>Visualização segura dos dados pessoais do usuário.</p>
+          </div>
+          <div class="feature-item">
+            <h3>📱 Responsivo</h3>
+            <p>Interface adaptável para desktop, tablet e mobile.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="files">
+        <h2>📁 Arquivos Criados</h2>
+
+        <div class="file-category">
+          <h3>🔌 API & Autenticação</h3>
+          <div class="file-item">
+            <span>📄</span>
+            <div>
+              <strong>src/api.py</strong>
+              <p>
+                API FastAPI com todos os endpoints (login, clientes, análise)
+              </p>
+            </div>
+          </div>
+          <div class="file-item">
+            <span>🔐</span>
+            <div>
+              <strong>src/auth.py</strong>
+              <p>Módulo de autenticação com JWT e gerenciamento de usuários</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="file-category">
+          <h3>🎨 Interface Web</h3>
+          <div class="file-item">
+            <span>🌐</span>
+            <div>
+              <strong>src/dashboard.html</strong>
+              <p>
+                Interface web completa com login, dashboard e análise de
+                transações
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="file-category">
+          <h3>🚀 Scripts de Inicialização</h3>
+          <div class="file-item">
+            <span>🐍</span>
+            <div>
+              <strong>main_api.py</strong>
+              <p>Script Python para iniciar a API com instruções</p>
+            </div>
+          </div>
+          <div class="file-item">
+            <span>💻</span>
+            <div>
+              <strong>iniciar_api.bat</strong>
+              <p>Script Windows para iniciar servidor facilmente</p>
+            </div>
+          </div>
+          <div class="file-item">
+            <span>🐧</span>
+            <div>
+              <strong>iniciar_api.sh</strong>
+              <p>Script Linux/Mac para iniciar servidor facilmente</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="file-category">
+          <h3>📚 Documentação</h3>
+          <div class="file-item">
+            <span>📖</span>
+            <div>
+              <strong>GETTING_STARTED.md</strong>
+              <p>Guia de início rápido com exemplos práticos</p>
+            </div>
+          </div>
+          <div class="file-item">
+            <span>📘</span>
+            <div>
+              <strong>docs/API_LOGIN.md</strong>
+              <p>Documentação completa da API com todos os endpoints</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="file-category">
+          <h3>⚙️ Configuração</h3>
+          <div class="file-item">
+            <span>📦</span>
+            <div>
+              <strong>requirements.txt (atualizado)</strong>
+              <p>Adicionadas dependências: PyJWT, python-multipart</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features">
+        <h2>🔌 Endpoints da API</h2>
+        <div
+          style="
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+          "
+        >
+          <table style="width: 100%; font-size: 14px; color: #6b7280">
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <th
+                style="
+                  text-align: left;
+                  padding: 10px;
+                  color: #1e40af;
+                  font-weight: 600;
+                "
+              >
+                Método
+              </th>
+              <th
+                style="
+                  text-align: left;
+                  padding: 10px;
+                  color: #1e40af;
+                  font-weight: 600;
+                "
+              >
+                Endpoint
+              </th>
+              <th
+                style="
+                  text-align: left;
+                  padding: 10px;
+                  color: #1e40af;
+                  font-weight: 600;
+                "
+              >
+                Descrição
+              </th>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">POST</td>
+              <td style="padding: 10px"><code>/api/login</code></td>
+              <td style="padding: 10px">Autentica um usuário</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">POST</td>
+              <td style="padding: 10px"><code>/api/registrar</code></td>
+              <td style="padding: 10px">Registra novo usuário</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">GET</td>
+              <td style="padding: 10px"><code>/api/perfil</code></td>
+              <td style="padding: 10px">Obtém perfil do usuário</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">GET</td>
+              <td style="padding: 10px"><code>/api/clientes</code></td>
+              <td style="padding: 10px">Lista clientes cadastrados</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">GET</td>
+              <td style="padding: 10px"><code>/api/clientes/{id}</code></td>
+              <td style="padding: 10px">Obtém cliente específico</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #e5e7eb">
+              <td style="padding: 10px">GET</td>
+              <td style="padding: 10px">
+                <code>/api/clientes/estatisticas/resumo</code>
+              </td>
+              <td style="padding: 10px">Estatísticas gerais</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px">POST</td>
+              <td style="padding: 10px">
+                <code>/api/analisar-transacao</code>
+              </td>
+              <td style="padding: 10px">Analisa transação suspeita</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="features">
+        <h2>🧪 Verificações Realizadas</h2>
+        <div class="feature-list">
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ API Inicia sem erros</h3>
+            <p>FastAPI e uvicorn funcionando perfeitamente</p>
+          </div>
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ Autenticação JWT</h3>
+            <p>Login, registro e geração de tokens validados</p>
+          </div>
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ Testes Automatizados</h3>
+            <p>4/4 testes passando com sucesso</p>
+          </div>
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ Pipeline ML</h3>
+            <p>Treinamento, scoring e alertas funcionando</p>
+          </div>
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ Dashboard Responsivo</h3>
+            <p>Interface funciona em desktop, tablet e mobile</p>
+          </div>
+          <div
+            class="feature-item"
+            style="background: #dcfce7; border-left-color: #10b981"
+          >
+            <h3>✅ Integração Completa</h3>
+            <p>API integrada com modelo de ML e dados</p>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          <strong>FraudShield</strong> - Sistema de Detecção de Fraudes
+          em Tempo Real
+        </p>
+        <p style="margin-top: 10px">Versão 1.0.0 | Maio 2026</p>
+        <p style="margin-top: 15px; font-size: 12px">
+          Para mais informações, consulte <strong>GETTING_STARTED.md</strong> e
+          <strong>docs/API_LOGIN.md</strong>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>

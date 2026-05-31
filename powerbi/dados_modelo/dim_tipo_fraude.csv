@@ -1,0 +1,6 @@
+﻿TipoFraudeKey,TipoFraude
+1,Fraude de Cartão (CNP)
+2,Apropriação de Conta (ATO)
+3,Golpe de Transferência/PIX
+4,Fraude em ATM/Saque
+5,Fraude de Pagamento de Conta

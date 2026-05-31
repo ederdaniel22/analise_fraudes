@@ -1,0 +1,30 @@
+# Copie para config/config.yaml e preencha. NUNCA versione config.yaml real.
+projeto: "FraudShield"
+ambiente: "producao"   # producao | homologacao | dev
+
+dados:
+  bank_transactions: "data/raw/Bank_Transaction_Fraud_Detection.csv"
+  creditcard: "data/raw/creditcard.csv"
+  transferencias: "data/raw/transferencias.csv"
+
+modelo:
+  caminho: "models/fraud_model.joblib"
+  limiar_alerta: 0.80        # score de fraude a partir do qual dispara alerta
+  limiar_revisao: 0.50       # zona de revisão manual
+
+alertas:
+  modo: "simulacao"          # simulacao | real
+  email:
+    smtp_host: "smtp.gmail.com"
+    smtp_port: 587
+    usuario: "${SMTP_USER}"
+    senha: "${SMTP_PASS}"
+    remetente: "fraudes@neobank.com.br"
+    destinatarios_analistas:
+      - "antifraude@neobank.com.br"
+  whatsapp:
+    twilio_account_sid: "${TWILIO_SID}"
+    twilio_auth_token: "${TWILIO_TOKEN}"
+    numero_origem: "whatsapp:+14155238886"
+    numeros_analistas:
+      - "whatsapp:+5511900000000"

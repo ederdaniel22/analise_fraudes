@@ -1,0 +1,15 @@
+.git
+.venv
+venv
+**/__pycache__
+*.pyc
+*.pyo
+reports/figures/*.png
+_qa*
+pipeline.log
+.env
+# Bases pesadas de treino NÃO são necessárias em produção (só o modelo treinado é):
+data/raw/creditcard.csv
+data/raw/transferencias.csv
+data/raw/bank_transactions_data_2.csv
+# Mantém: models/fraud_model.joblib e data/raw/Bank_Transaction_Fraud_Detection.csv (usado nas estatísticas)
